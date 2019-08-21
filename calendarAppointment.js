@@ -19,7 +19,8 @@ if (!String.prototype.includes) {
 }
 
 // Get the active spreadsheet
-var sheetId = SpreadsheetApp.getActiveSpreadsheet()
+var sheetId = SpreadsheetApp.openById('1jjTZWwmunFpRPzWUvU0T3N8X-lwU8B3pNeMkjEE04Fs')
+sheetId = sheetId.getSheetByName('2005-Daniel')
 
 // Function to run every hour
 function fire () {
@@ -38,7 +39,7 @@ function getSheetData () {
   // Get the calendat id from the sheet
   var calendarId = sheetId.getRange('P1').getValues()
 
-  var final = []
+  final = []
   // Iterate through the collected data
   for (var i = 0; i < data.length; i++) {
     if (data[i][8].toLowerCase().includes('back') || data[i][8].toLowerCase().includes('scheduled')) {
@@ -56,7 +57,8 @@ function getSheetData () {
           notes: data[i][9],
           startDate: data[i][10],
           startTime: data[i][11],
-          scheduled: data[i][12]
+          scheduled: data[i][12],
+          index: i + 2
         })
       }
     }
@@ -90,21 +92,21 @@ function createCalendarEvent (sheetData) {
     // for the event that will be created
     var options = {
       description: description,
-      guests: 'carlos@topfloormarketing.net',
+      guests: 'jose@topfloormarketing.net',
       sendInvites: true
     }
 
     try {
       // Set the shceduled flag to true
-      sheetId.getRange('M' + (i + 2)).setValue('Y')
+      sheetId.getRange('M' + sheetData[i].index).setValue('Y')
 
       // create a calendar event with given title, start time,
       // end time, and description and guests stored in an
       // options argument
-      calendar.getDefaultCalendar().createEvent(title, startTime, endTime, options)
+      var event = calendar.getDefaultCalendar().createEvent(title, startTime, endTime, options)
     } catch (e) {
       // create the event without including the guest
-      calendar.createEvent(title, startTime, endTime, options)
+      var event = calendar.createEvent(title, startTime, endTime, options)
     }
   }
 }
